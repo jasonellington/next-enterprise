@@ -1,79 +1,55 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fs = require("fs")
-
 module.exports = {
-  extends: [
-    "next",
-    "prettier",
-    "react-app",
-    "react-app/jest",
-    "plugin:storybook/recommended",
-    "plugin:tailwindcss/recommended",
-  ],
-  parserOptions: {
-    babelOptions: {
-      presets: [require.resolve("next/babel")],
-    },
-  },
+  extends: ['next/core-web-vitals', 'prettier'],
+  plugins: ['jsx-a11y', '@typescript-eslint', 'simple-import-sort', 'unused-imports'],
   rules: {
-    "tailwindcss/no-custom-classname": "off",
-    "testing-library/prefer-screen-queries": "off",
-    "@next/next/no-html-link-for-pages": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
+    'react/no-unescaped-entities': 'off',
+    //#region  //*=========== Unused Import ===========
+    'unused-imports/no-unused-imports': 'error',
+    // eslint-ts-unused-imports
+    'unused-imports/no-unused-vars': [
+      'warn',
       {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
       },
     ],
-    "sort-imports": [
-      "error",
+    //#region  //*=========== Import Sort ===========
+    'simple-import-sort/exports': 'warn',
+    'simple-import-sort/imports': [
+      'warn',
       {
-        ignoreCase: true,
-        ignoreDeclarationSort: true,
-      },
-    ],
-    "tailwindcss/classnames-order": "off",
-    "import/order": [
-      1,
-      {
-        groups: ["external", "builtin", "internal", "sibling", "parent", "index"],
-        pathGroups: [
-          ...getDirectoriesToSort().map((singleDir) => ({
-            pattern: `${singleDir}/**`,
-            group: "internal",
-          })),
-          {
-            pattern: "env",
-            group: "internal",
-          },
-          {
-            pattern: "theme",
-            group: "internal",
-          },
-          {
-            pattern: "public/**",
-            group: "internal",
-            position: "after",
-          },
+        groups: [
+          ['^react?\\w', '^@?\\w', '^\\u0000'],
+          // packages
+          ['^.+\\.s?css$'],
+          // {s}css files
+          ['^db?\\w', '^integrations?\\w', '^utils?\\w', '^\\u0000'],
+          // packages
+          ['^src/components', '^src/container'],
+          // components
+          ['^src/mutations'],
+          // mutations
+          ['^src/queries'],
+          // queries
+          ['^src/'],
+          // relative paths up until 3 level
+          [
+            '^\\./?$',
+            '^\\.(?!/?$)',
+            '^\\.\\./?$',
+            '^\\.\\.(?!/?$)',
+            '^\\.\\./\\.\\./?$',
+            '^\\.\\./\\.\\.(?!/?$)',
+            '^\\.\\./\\.\\./\\.\\./?$',
+            '^\\.\\./\\.\\./\\.\\.(?!/?$)',
+          ],
+          ['^src/types'],
+          // other that didn't fit in
+          ['^'],
         ],
-        pathGroupsExcludedImportTypes: ["internal"],
-        alphabetize: {
-          order: "asc",
-          caseInsensitive: true,
-        },
       },
     ],
   },
-}
-
-function getDirectoriesToSort() {
-  const ignoredSortingDirectories = [".git", ".next", ".vscode", "node_modules"]
-  return getDirectories(process.cwd()).filter((f) => !ignoredSortingDirectories.includes(f))
-}
-
-function getDirectories(path) {
-  return fs.readdirSync(path).filter(function (file) {
-    return fs.statSync(path + "/" + file).isDirectory()
-  })
 }
